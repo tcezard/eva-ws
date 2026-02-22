@@ -5,17 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.support.TestPropertySourceUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import uk.ac.ebi.eva.countstats.AbstractCountStatsIntegrationTest;
 import uk.ac.ebi.eva.countstats.model.Count;
 import uk.ac.ebi.eva.countstats.repository.CountRepository;
 
@@ -27,9 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Testcontainers
-@ContextConfiguration(initializers = CountStatsIntegrationTest.DockerPostgreDataSourceInitializer.class)
-public class CountStatsIntegrationTest {
+public class CountStatsIntegrationTest extends AbstractCountStatsIntegrationTest {
+
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -37,31 +30,11 @@ public class CountStatsIntegrationTest {
     @Autowired
     private CountRepository countRepository;
 
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "password";
-
-    @Container
-    public static PostgreSQLContainer<?> postgreDBContainer = new PostgreSQLContainer<>("postgres:9.6");
-
-    public static class DockerPostgreDataSourceInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        @Override
-        public void initialize(ConfigurableApplicationContext applicationContext) {
-            TestPropertySourceUtils.addInlinedPropertiesToEnvironment(
-                    applicationContext,
-                    "spring.datasource.url=" + postgreDBContainer.getJdbcUrl(),
-                    "spring.datasource.username=" + postgreDBContainer.getUsername(),
-                    "spring.datasource.password=" + postgreDBContainer.getPassword(),
-                    "controller.auth.admin.username=" + USERNAME,
-                    "controller.auth.admin.password=" + PASSWORD
-            );
-        }
-    }
-
     @Test
     @Transactional
     public void testSaveCount() throws Exception {
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setBasicAuth(USERNAME, PASSWORD);
+        httpHeaders.setBasicAuth(TEST_USERNAME, TEST_PASSWORD);
         Count count1 = new Count("VARIANT_WAREHOUSE_INGESTION", "{\"study\": \"PRJ11111\", \"analysis\": \"ERZ11111\", \"batch\":1}",
                 "INSERTED_VARIANTS", 10000);
         Count count2 = new Count("VARIANT_WAREHOUSE_INGESTION", "{\"study\": \"PRJ11111\", \"analysis\": \"ERZ11111\", \"batch\":1}",

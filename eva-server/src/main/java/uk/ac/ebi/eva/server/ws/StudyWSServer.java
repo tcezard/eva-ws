@@ -19,7 +19,7 @@
 
 package uk.ac.ebi.eva.server.ws;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,14 +41,14 @@ import uk.ac.ebi.eva.lib.utils.QueryResult;
 import uk.ac.ebi.eva.lib.eva_utils.DBAdaptorConnector;
 import uk.ac.ebi.eva.lib.eva_utils.MultiMongoDbFactory;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
 @RestController
 @RequestMapping(value = "/v1/studies", produces = "application/json")
-@Api(tags = {"studies"})
+@Tag(name = "studies")
 public class StudyWSServer extends EvaWSServer {
 
     @Autowired

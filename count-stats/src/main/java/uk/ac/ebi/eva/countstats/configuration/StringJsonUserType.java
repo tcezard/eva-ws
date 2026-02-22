@@ -1,6 +1,5 @@
 package uk.ac.ebi.eva.countstats.configuration;
 
-import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.usertype.UserType;
 
@@ -10,19 +9,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-public class StringJsonUserType implements UserType {
+public class StringJsonUserType implements UserType<String> {
+
     @Override
-    public int[] sqlTypes() {
-        return new int[]{Types.JAVA_OBJECT};
+    public int getSqlType() {
+        return Types.OTHER;
     }
 
     @Override
-    public Class returnedClass() {
+    public Class<String> returnedClass() {
         return String.class;
     }
 
     @Override
-    public boolean equals(Object x, Object y) throws HibernateException {
+    public boolean equals(String x, String y) {
         if (x == null) {
             return y == null;
         }
@@ -30,49 +30,47 @@ public class StringJsonUserType implements UserType {
     }
 
     @Override
-    public int hashCode(Object x) throws HibernateException {
+    public int hashCode(String x) {
         return x.hashCode();
     }
 
     @Override
-    public Object nullSafeGet(ResultSet rs, String[] names, SharedSessionContractImplementor session, Object owner) throws HibernateException, SQLException {
-        if (rs.getString(names[0]) == null) {
+    public String nullSafeGet(ResultSet rs, int position, SharedSessionContractImplementor session, Object owner)
+            throws SQLException {
+        String value = rs.getString(position);
+        if (rs.wasNull()) {
             return null;
         }
-        return rs.getString(names[0]);
+        return value;
     }
 
     @Override
-    public void nullSafeSet(PreparedStatement st, Object value, int index, SharedSessionContractImplementor session) throws HibernateException, SQLException {
+    public void nullSafeSet(PreparedStatement st, String value, int index, SharedSessionContractImplementor session)
+            throws SQLException {
         if (value == null) {
             st.setNull(index, Types.OTHER);
-            return;
+        } else {
+            st.setObject(index, value, Types.OTHER);
         }
-        st.setObject(index, value, Types.OTHER);
     }
 
     @Override
-    public Object deepCopy(Object value) throws HibernateException {
+    public String deepCopy(String value) {
         return value;
     }
 
     @Override
     public boolean isMutable() {
-        return true;
+        return false;
     }
 
     @Override
-    public Serializable disassemble(Object value) throws HibernateException {
-        return (String) this.deepCopy(value);
+    public Serializable disassemble(String value) {
+        return value;
     }
 
     @Override
-    public Object assemble(Serializable cached, Object owner) throws HibernateException {
-        return this.deepCopy(cached);
-    }
-
-    @Override
-    public Object replace(Object original, Object target, Object owner) throws HibernateException {
-        return original;
+    public String assemble(Serializable cached, Object owner) {
+        return (String) cached;
     }
 }

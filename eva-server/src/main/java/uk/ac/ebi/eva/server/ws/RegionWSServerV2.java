@@ -19,15 +19,14 @@
 
 package uk.ac.ebi.eva.server.ws;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.PagedResources.PageMetadata;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.PagedResources.PageMetadata;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.PagedModel.PageMetadata;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +36,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import springfox.documentation.annotations.ApiIgnore;
 import uk.ac.ebi.eva.commons.core.models.AnnotationMetadata;
 import uk.ac.ebi.eva.commons.core.models.Region;
 import uk.ac.ebi.eva.commons.core.models.contigalias.ContigAliasChromosome;
@@ -56,8 +54,8 @@ import uk.ac.ebi.eva.server.RateLimit;
 import uk.ac.ebi.eva.server.Utils;
 import uk.ac.ebi.eva.server.ws.contigalias.ContigAliasService;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -67,12 +65,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping(value = "/v2/regions", produces = "application/hal+json")
-@Api(tags = {"regions"})
+@Tag(name = "regions")
 public class RegionWSServerV2 {
 
     private static final int REGION_REQUEST_RATE_LIMIT = 5;
@@ -93,49 +91,49 @@ public class RegionWSServerV2 {
     @ResponseBody
     @RateLimit(value = REGION_REQUEST_RATE_LIMIT)
     public ResponseEntity getVariantsByRegion(
-            @ApiParam(value = "Comma separated genomic regions in the format chr:start-end.")
+            @Parameter(description = "Comma separated genomic regions in the format chr:start-end.")
             @PathVariable("regionId") String regionId,
-            @ApiParam(value = "First letter of the genus, followed by the full species name, e.g. hsapiens. " +
+            @Parameter(description = "First letter of the genus, followed by the full species name, e.g. hsapiens. " +
                     "Allowed values can be looked up in /v1/meta/species/list/ in the field named 'taxonomyCode'.",
                     required = true)
             @RequestParam(name = "species") String species,
-            @ApiParam(value = "Encoded assembly name, e.g. grch37. Allowed values can be looked up in " +
+            @Parameter(description = "Encoded assembly name, e.g. grch37. Allowed values can be looked up in " +
                     "/v1/meta/species/list/ in the field named 'assemblyCode'.", required = true)
             @RequestParam(name = "assembly") String assembly,
-            @ApiParam(value = "Identifiers of studies. If this field is null/not specified, all studies should" +
+            @Parameter(description = "Identifiers of studies. If this field is null/not specified, all studies should" +
                     " be queried. Each individual identifier of studies can be looked up in" +
                     " /v2/studies in the field named `studyId`. e.g. PRJEB6930,PRJEB27824")
             @RequestParam(name = "studies", required = false) List<String> studies,
-            @ApiParam(value = "Retrieve only variants with exactly this consequence type (as stated by Ensembl VEP)")
+            @Parameter(description = "Retrieve only variants with exactly this consequence type (as stated by Ensembl VEP)")
             @RequestParam(name = "annot-ct", required = false) List<String>
                     consequenceType,
-            @ApiParam(value = "Retrieve only variants whose Minor Allele Frequency is less than (<), less" +
+            @Parameter(description = "Retrieve only variants whose Minor Allele Frequency is less than (<), less" +
                     " than or equals (<=), greater than (>), greater than or equals (>=) or equals (=) the" +
                     " provided number. e.g. <0.1")
             @RequestParam(name = "maf", required = false) String maf,
-            @ApiParam(value = "Retrieve only variants whose PolyPhen score as stated by Ensembl VEP is less than" +
+            @Parameter(description = "Retrieve only variants whose PolyPhen score as stated by Ensembl VEP is less than" +
                     " (<), less than or equals (<=), greater than (>), greater than or equals (>=) or equals (=) " +
                     "the provided number. e.g. <0.1")
             @RequestParam(name = "polyphen", required = false) String polyphenScore,
-            @ApiParam(value = "Retrieve only variants whose SIFT score as stated by Ensembl VEP is less than (<)," +
+            @Parameter(description = "Retrieve only variants whose SIFT score as stated by Ensembl VEP is less than (<)," +
                     " less than or equals (<=), greater than (>), greater than or equals (>=) or equals (=) the " +
                     "provided number. e.g. <0.1")
             @RequestParam(name = "sift", required = false) String siftScore,
-            @ApiParam(value = "Ensembl VEP release whose annotations will be included in the response, e.g. 78")
+            @Parameter(description = "Ensembl VEP release whose annotations will be included in the response, e.g. 78")
             @RequestParam(name = "annot-vep-version", required = false) String
                     annotationVepVersion,
-            @ApiParam(value = "Ensembl VEP cache release whose annotations will be included in the response, " +
+            @Parameter(description = "Ensembl VEP cache release whose annotations will be included in the response, " +
                     "e.g. 78")
             @RequestParam(name = "annot-vep-cache-version", required = false) String
                     annotationVepCacheVersion,
-            @ApiParam(value = "Contig naming convention desired, default is INSDC")
+            @Parameter(description = "Contig naming convention desired, default is INSDC")
             @RequestParam(name = "contigNamingConvention", required = false) ContigNamingConvention contigNamingConvention,
-            @ApiParam(value = "The number of the page that should be displayed. Starts from 0 and is an integer.")
+            @Parameter(description = "The number of the page that should be displayed. Starts from 0 and is an integer.")
             @RequestParam(required = false, defaultValue = "0") Integer pageNumber,
-            @ApiParam(value = "The number of elements that should be displayed in a single page.")
+            @Parameter(description = "The number of elements that should be displayed in a single page.")
             @RequestParam(required = false, defaultValue = "20") Integer pageSize,
             HttpServletResponse response,
-            @ApiIgnore HttpServletRequest request)
+            HttpServletRequest request)
             throws IllegalArgumentException {
         checkParameters(annotationVepVersion, annotationVepCacheVersion, species);
 
@@ -153,7 +151,7 @@ public class RegionWSServerV2 {
         Integer totalNumberOfResults = service.countByRegionsAndComplexFilters(regions, filters).intValue();
 
         if (totalNumberOfResults == 0) {
-            return new ResponseEntity(new PagedResources<>(Collections.EMPTY_LIST, new PageMetadata(pageSize,
+            return new ResponseEntity(PagedModel.of(Collections.EMPTY_LIST, new PageMetadata(pageSize,
                     pageNumber < 0 ? 0 : pageNumber, totalNumberOfResults)), HttpStatus.NO_CONTENT);
         }
 
@@ -196,7 +194,7 @@ public class RegionWSServerV2 {
                             filters,
                             annotationMetadata,
                             excludeMapped,
-                            new PageRequest(pageNumber, pageSize));
+                            PageRequest.of(pageNumber, pageSize));
                 }
 
             }
@@ -204,10 +202,10 @@ public class RegionWSServerV2 {
             return new ResponseEntity(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
-        List<Resource> resourcesList = getResources(variantEntities, species, assembly, contigNamingConvention,
+        List<EntityModel> resourcesList = getResources(variantEntities, species, assembly, contigNamingConvention,
                 insdcRegionAndNameInOriginalNamingConventionMap, response);
 
-        PagedResources pagedResources = buildPage(resourcesList, pageMetadata, regionId, species, assembly, studies,
+        PagedModel<EntityModel> pagedResources = buildPage(resourcesList, pageMetadata, regionId, species, assembly, studies,
                 consequenceType, maf, polyphenScore, siftScore, annotationVepVersion, annotationVepCacheVersion, contigNamingConvention,
                 response, request);
 
@@ -255,14 +253,14 @@ public class RegionWSServerV2 {
             throw new IllegalArgumentException("For the given page size, there are " + totalPages + " page(s), so the"
                     + " correct page range is from 0 to " + String.valueOf(totalPages - 1) + " (both included).");
         }
-        return new PagedResources.PageMetadata(pageSize, pageNumber, totalNumberOfResults, totalPages);
+        return new PageMetadata(pageSize, pageNumber, totalNumberOfResults, totalPages);
     }
 
-    private List<Resource> getResources(List<VariantWithSamplesAndAnnotation> variantEntities, String species,
+    private List<EntityModel> getResources(List<VariantWithSamplesAndAnnotation> variantEntities, String species,
                                         String assembly, ContigNamingConvention contigNamingConvention,
                                         Map<Region, String> insdcRegionAndNameInOriginalNamingConventionMap,
                                         HttpServletResponse response) {
-        List<Resource> resourcesList = new ArrayList<>();
+        List<EntityModel> resourcesList = new ArrayList<>();
 
         variantEntities.forEach(variantEntity -> {
             String variantContig = variantEntity.getChromosome();
@@ -288,23 +286,23 @@ public class RegionWSServerV2 {
             String variantCoreString = variantEntity.getChromosome() + ":" + variantEntity.getStart() + ":" +
                     variantEntity.getReference() + ":" + variantEntity.getAlternate();
 
-            Link annotationsLink = new Link(linkTo(methodOn(VariantWSServerV2.class).getAnnotations(variantCoreString,
-                    species, assembly, null, null, contigNamingConvention, response)).toUri().toString(), "annotation");
-            Link sourcesLink = new Link(linkTo(methodOn(VariantWSServerV2.class).getSources(variantCoreString, species,
-                    assembly, null, null, contigNamingConvention, response)).toUri().toString(), "sources");
+            Link annotationsLink = linkTo(methodOn(VariantWSServerV2.class).getAnnotations(variantCoreString,
+                    species, assembly, null, null, contigNamingConvention, response)).withRel("annotation");
+            Link sourcesLink = linkTo(methodOn(VariantWSServerV2.class).getSources(variantCoreString, species,
+                    assembly, null, null, contigNamingConvention, response)).withRel("sources");
 
-            resourcesList.add(new Resource<>(variant, Arrays.asList(sourcesLink, annotationsLink)));
+            resourcesList.add(EntityModel.of(variant, Arrays.asList(sourcesLink, annotationsLink)));
         });
         return resourcesList;
     }
 
-    private PagedResources buildPage(List<Resource> resourcesList, PageMetadata pageMetadata, String regionId,
-                                     String species, String assembly, List<String> studies,
-                                     List<String> consequenceType, String maf, String polyphenScore,
-                                     String siftScore, String annotationVepVersion, String annotationVepCacheVersion,
-                                     ContigNamingConvention contigNamingConvention,
-                                     HttpServletResponse response, HttpServletRequest request) {
-        PagedResources pagedResources = new PagedResources<>(resourcesList, pageMetadata);
+    private PagedModel<EntityModel> buildPage(List<EntityModel> resourcesList, PageMetadata pageMetadata, String regionId,
+                                              String species, String assembly, List<String> studies,
+                                              List<String> consequenceType, String maf, String polyphenScore,
+                                              String siftScore, String annotationVepVersion, String annotationVepCacheVersion,
+                                              ContigNamingConvention contigNamingConvention,
+                                              HttpServletResponse response, HttpServletRequest request) {
+        PagedModel<EntityModel> pagedResources = PagedModel.of(resourcesList, pageMetadata);
 
         int pageNumber = (int) pageMetadata.getNumber();
         int pageSize = (int) pageMetadata.getSize();
@@ -336,10 +334,9 @@ public class RegionWSServerV2 {
                                       String siftScore, String annotationVepVersion, String annotationVepCacheVersion,
                                       ContigNamingConvention contigNamingConvention, int pageNumber, int pageSize,
                                       HttpServletResponse response, HttpServletRequest request, String linkName) {
-        return new Link(linkTo(methodOn(RegionWSServerV2.class).getVariantsByRegion(regionId, species, assembly,
+        return linkTo(methodOn(RegionWSServerV2.class).getVariantsByRegion(regionId, species, assembly,
                 studies, consequenceType, maf, polyphenScore, siftScore, annotationVepVersion,
                 annotationVepCacheVersion, contigNamingConvention, pageNumber, pageSize, response, request))
-                .toUriComponentsBuilder()
-                .toUriString(), linkName);
+                .withRel(linkName);
     }
 }

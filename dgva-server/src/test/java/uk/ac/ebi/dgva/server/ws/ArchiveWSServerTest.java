@@ -20,9 +20,9 @@ package uk.ac.ebi.dgva.server.ws;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -31,7 +31,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import uk.ac.ebi.eva.commons.core.models.StudyType;
 import uk.ac.ebi.eva.lib.metadata.dgva.ArchiveDgvaDBAdaptor;
@@ -50,15 +50,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ArchiveWSServerTest {
 
@@ -71,7 +71,7 @@ public class ArchiveWSServerTest {
     @MockBean
     private StudyDgvaDBAdaptor studyDgvaDBAdaptor;
 
-    @Before
+    @BeforeEach
     public void setup() throws URISyntaxException, IOException {
         VariantStudy svStudy1 = new VariantStudy("Human SV Test study 1", "svS1", null, "SV study 1 description",
                                                  new int[]{9606},
@@ -89,19 +89,19 @@ public class ArchiveWSServerTest {
                                                  "multi-isolate", StudyType.AGGREGATE, "Whole Genome Sequencing",
                                                  "WGSS", "Bos_taurus_UMD_3.1", "GCA_000003055.3", "Illumina",
                                                  new URI("http://www.cs1.org"), new String[]{"1", "2"}, 1300, 12, false);
-        given(studyDgvaDBAdaptor.getAllStudies(anyObject()))
+        given(studyDgvaDBAdaptor.getAllStudies(any()))
                 .willReturn(encapsulateInQueryResult(svStudy1, svStudy2, svStudy3));
 
         Map<String, Long> svStudiesGroupedBySpeciesName = Stream.of(svStudy1, svStudy2, svStudy3)
                                                                 .collect(Collectors.groupingBy(VariantStudy::getSpeciesCommonName, Collectors.counting()));
-        given(archiveDgvaDBAdaptor.countStudiesPerSpecies(anyObject()))
+        given(archiveDgvaDBAdaptor.countStudiesPerSpecies(any()))
                 .willReturn(encapsulateInQueryResult(svStudiesGroupedBySpeciesName.entrySet().toArray()));
 
         Map<String, Long> svStudiesGroupedByStudyType = Stream.of(svStudy1, svStudy2, svStudy3)
                                                               .map(s -> s.getType().toString())
                                                               .collect(Collectors.groupingBy(Function.identity(),
                                                                                              Collectors.counting()));
-        given(archiveDgvaDBAdaptor.countStudiesPerType(anyObject()))
+        given(archiveDgvaDBAdaptor.countStudiesPerType(any()))
                 .willReturn(encapsulateInQueryResult(svStudiesGroupedByStudyType.entrySet().toArray()));
     }
 

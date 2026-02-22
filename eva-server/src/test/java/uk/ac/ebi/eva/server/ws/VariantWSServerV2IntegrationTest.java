@@ -26,12 +26,10 @@ import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.TypeRef;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -39,55 +37,38 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.ac.ebi.eva.commons.core.models.Annotation;
 import uk.ac.ebi.eva.commons.core.models.contigalias.ContigAliasChromosome;
 import uk.ac.ebi.eva.commons.core.models.contigalias.ContigNamingConvention;
 import uk.ac.ebi.eva.commons.core.models.ws.VariantSourceEntryWithSampleNames;
 import uk.ac.ebi.eva.commons.core.models.ws.VariantWithSamplesAndAnnotation;
 import uk.ac.ebi.eva.commons.mongodb.services.VariantWithSamplesAndAnnotationsService;
-import uk.ac.ebi.eva.lib.Profiles;
 import uk.ac.ebi.eva.lib.utils.TaxonomyUtils;
 import uk.ac.ebi.eva.server.configuration.MongoRepositoryTestConfiguration;
+import uk.ac.ebi.eva.server.test.TestDataLoader;
 import uk.ac.ebi.eva.server.ws.contigalias.ContigAliasService;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
-import static com.lordofthejars.nosqlunit.mongodb.MongoDbRule.MongoDbRuleBuilder.newMongoDbRule;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(MongoRepositoryTestConfiguration.class)
-@UsingDataSet(locations = {
-        "/test-data/variants.json",
-        "/test-data/files.json",
-        "/test-data/annotations.json",
-        "/test-data/annotation_metadata.json"
-})
-@ActiveProfiles(Profiles.TEST_MONGO_FACTORY)
-public class VariantWSServerV2IntegrationTest {
-
-    private static final String TEST_DB = "test-db";
-
-    @Rule
-    public MongoDbRule mongoDbRule = newMongoDbRule().defaultSpringMongoDb(TEST_DB);
-
-    @Autowired
-    MongoDbFactory mongoDbFactory;
+public class VariantWSServerV2IntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -107,8 +88,18 @@ public class VariantWSServerV2IntegrationTest {
     @MockBean
     private TaxonomyUtils taxonomyUtils;
 
-    @Before
-    public void setUp() throws Exception {
+    @Autowired
+    private TestDataLoader testDataLoader;
+
+    @BeforeEach
+    public void setUp() throws IOException {
+        testDataLoader.load(
+                "/test-data/variants.json",
+                "/test-data/files.json",
+                "/test-data/annotations.json",
+                "/test-data/annotation_metadata.json"
+        );
+
         given(contigAliasService.translateContigFromInsdc("13", null))
                 .willReturn("");
         given(contigAliasService.translateContigFromInsdc("20", null))
@@ -134,6 +125,11 @@ public class VariantWSServerV2IntegrationTest {
         given(contigAliasService.getMatchingContigNamingConvention(any(), any())).willReturn(ContigNamingConvention.INSDC);
 
         given(taxonomyUtils.getAssemblyAccessionForAssemblyCode("grcm38")).willReturn(Optional.of("GCA_000001635.2"));
+    }
+
+    @AfterEach
+    public void tearDown() {
+        testDataLoader.cleanUp("testVariants", "testFiles", "testAnnotations", "testMetadata");
     }
 
     @Test

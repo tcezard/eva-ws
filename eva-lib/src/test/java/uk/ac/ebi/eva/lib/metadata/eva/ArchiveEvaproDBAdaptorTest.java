@@ -15,14 +15,14 @@
  */
 package uk.ac.ebi.eva.lib.metadata.eva;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import uk.ac.ebi.eva.lib.entities.Project;
 import uk.ac.ebi.eva.lib.entities.Taxonomy;
@@ -39,13 +39,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.ac.ebi.eva.lib.metadata.MetadataTestData.BOS_TAURUS;
 import static uk.ac.ebi.eva.lib.metadata.MetadataTestData.CATTLE;
 import static uk.ac.ebi.eva.lib.metadata.MetadataTestData.HOMO_SAPIENS;
 import static uk.ac.ebi.eva.lib.metadata.MetadataTestData.HUMAN;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @DataJpaTest
 @Sql({"classpath:eva-schema.sql", "classpath:eva-data.sql"})
 public class ArchiveEvaproDBAdaptorTest {
@@ -55,7 +55,7 @@ public class ArchiveEvaproDBAdaptorTest {
     @Autowired
     private ArchiveEvaproDBAdaptor archiveEvaproDBAdaptor;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         Project prj1 = new Project("PRJEB1", "EBI", "PRJ 1", "Project 1 title", "Project 1 description",
                                    "multi-isolate", "DNA", "genome", "SUBMISSION", "ERP1", "Germline", 1L,

@@ -19,7 +19,7 @@
 
 package uk.ac.ebi.eva.server.ws;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 import uk.ac.ebi.eva.commons.core.models.AnnotationMetadata;
 import uk.ac.ebi.eva.commons.core.models.Region;
 import uk.ac.ebi.eva.commons.core.models.contigalias.ContigAliasChromosome;
@@ -52,8 +51,8 @@ import uk.ac.ebi.eva.server.RateLimit;
 import uk.ac.ebi.eva.server.Utils;
 import uk.ac.ebi.eva.server.ws.contigalias.ContigAliasService;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,7 +64,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/v1/segments", produces = "application/json")
-@Api(tags = {"segments"})
+@Tag(name = "segments")
 public class RegionWSServer extends EvaWSServer {
 
     @Autowired
@@ -100,7 +99,7 @@ public class RegionWSServer extends EvaWSServer {
                                              @RequestParam(name = "contigNamingConvention", required = false)
                                              ContigNamingConvention contigNamingConvention,
                                              HttpServletResponse response,
-                                             @ApiIgnore HttpServletRequest request)
+                                             HttpServletRequest request)
             throws IOException {
         initializeQuery();
 

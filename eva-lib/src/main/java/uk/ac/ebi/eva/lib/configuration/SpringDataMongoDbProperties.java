@@ -18,7 +18,7 @@ package uk.ac.ebi.eva.lib.configuration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 @ConfigurationProperties(ignoreUnknownFields = false, prefix = "spring.data.mongodb")
 @Component

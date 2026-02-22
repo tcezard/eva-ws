@@ -18,7 +18,7 @@
  */
 package uk.ac.ebi.eva.server.ws.ga4gh;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ import uk.ac.ebi.eva.server.Utils;
 import uk.ac.ebi.eva.server.ws.EvaWSServer;
 import uk.ac.ebi.eva.server.ws.contigalias.ContigAliasService;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/v1/ga4gh/variants", produces = "application/json")
-@Api(tags = {"ga4gh", "variants"})
+@Tag(name = "ga4gh")
 public class GA4GHVariantWSServer extends EvaWSServer {
 
     @Autowired

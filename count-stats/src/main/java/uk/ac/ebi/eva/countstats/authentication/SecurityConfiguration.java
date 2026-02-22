@@ -1,49 +1,42 @@
 package uk.ac.ebi.eva.countstats.authentication;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration {
 
     public static final String REALM = "EBI-REALM";
 
     private static final String ROLE_ADMIN = "ADMIN";
 
-    private final CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint;
-
-    @Value("${controller.auth.admin.username}")
-    private String USERNAME_ADMIN;
-
-    @Value("${controller.auth.admin.password}")
-    private String PASSWORD_ADMIN;
-
-    @Autowired
-    public SecurityConfiguration(CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint) {
-        this.customBasicAuthenticationEntryPoint = customBasicAuthenticationEntryPoint;
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http,
+            CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET).permitAll()
+                        .requestMatchers(HttpMethod.POST).hasRole(ROLE_ADMIN))
+                .httpBasic(basic -> basic.realmName(REALM).authenticationEntryPoint(customBasicAuthenticationEntryPoint))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        return http.build();
     }
 
-    @Autowired
-    public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser(USERNAME_ADMIN).password("{noop}" + PASSWORD_ADMIN).roles(ROLE_ADMIN);
-    }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests()
-                .antMatchers(HttpMethod.GET).permitAll()
-                .antMatchers(HttpMethod.POST).hasRole(ROLE_ADMIN)
-                .and().httpBasic().realmName(REALM)
-                .authenticationEntryPoint(customBasicAuthenticationEntryPoint)
-                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    @Bean
+    public UserDetailsService userDetailsService(
+            @Value("${controller.auth.admin.username}") String username,
+            @Value("${controller.auth.admin.password}") String password) {
+        return new InMemoryUserDetailsManager(
+                User.withUsername(username).password("{noop}" + password).roles(ROLE_ADMIN).build());
     }
 }

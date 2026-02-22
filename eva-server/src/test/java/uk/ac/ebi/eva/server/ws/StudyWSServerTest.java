@@ -1,16 +1,16 @@
 package uk.ac.ebi.eva.server.ws;
 
 import com.google.common.collect.Sets;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import uk.ac.ebi.eva.lib.entities.Analysis;
 import uk.ac.ebi.eva.lib.entities.DbXref;
@@ -51,9 +51,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StudyWSServerTest {
 
@@ -90,7 +90,7 @@ public class StudyWSServerTest {
     @Autowired
     private AnalysisRepository analysisRepository;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // Create and save entities required for analyses
         Submission submission1 = new Submission(1L, "ERA123", "PROJECT", "ADD", "first submission", null,

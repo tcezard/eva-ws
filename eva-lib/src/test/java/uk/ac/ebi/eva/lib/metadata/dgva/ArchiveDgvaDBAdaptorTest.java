@@ -15,12 +15,12 @@
  */
 package uk.ac.ebi.eva.lib.metadata.dgva;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import uk.ac.ebi.eva.lib.utils.QueryOptions;
 import uk.ac.ebi.eva.lib.utils.QueryResult;
@@ -29,13 +29,14 @@ import uk.ac.ebi.eva.lib.utils.QueryOptionsConstants;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.ac.ebi.eva.lib.metadata.MetadataTestData.CHICKEN;
 import static uk.ac.ebi.eva.lib.metadata.MetadataTestData.CHIMPANZEE;
 import static uk.ac.ebi.eva.lib.metadata.MetadataTestData.HUMAN;
 import static uk.ac.ebi.eva.lib.metadata.MetadataTestData.MOUSE;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @DataJpaTest
 @Sql({"classpath:dgva-schema.sql", "classpath:dgva-data.sql"})
 public class ArchiveDgvaDBAdaptorTest {
@@ -139,18 +140,18 @@ public class ArchiveDgvaDBAdaptorTest {
         assertEquals(26, collectionStudiesCount);
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void countFiles() throws Exception {
-        archiveDgvaDBAdaptor.countFiles();
+        assertThrows(UnsupportedOperationException.class, () -> archiveDgvaDBAdaptor.countFiles());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void countSpecies() throws Exception {
-        archiveDgvaDBAdaptor.countSpecies();
+        assertThrows(UnsupportedOperationException.class, () -> archiveDgvaDBAdaptor.countSpecies());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void getBrowsableSpecies() throws Exception {
-        archiveDgvaDBAdaptor.getBrowsableSpecies();
+        assertThrows(UnsupportedOperationException.class, () -> archiveDgvaDBAdaptor.getBrowsableSpecies());
     }
 }

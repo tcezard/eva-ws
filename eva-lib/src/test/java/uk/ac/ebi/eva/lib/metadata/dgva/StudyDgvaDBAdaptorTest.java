@@ -15,21 +15,21 @@
  */
 package uk.ac.ebi.eva.lib.metadata.dgva;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import uk.ac.ebi.eva.lib.models.VariantStudy;
 import uk.ac.ebi.eva.lib.utils.QueryOptions;
 import uk.ac.ebi.eva.lib.utils.QueryResult;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @DataJpaTest
 public class StudyDgvaDBAdaptorTest {
 
@@ -39,7 +39,7 @@ public class StudyDgvaDBAdaptorTest {
     @Autowired
     private StudyDgvaDBAdaptor studyDgvaDBAdaptor;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         DgvaStudyTestData.persistTestData(entityManager);
     }
@@ -51,14 +51,14 @@ public class StudyDgvaDBAdaptorTest {
         assertEquals(3, queryResult.getNumTotalResults());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void listStudies() throws Exception {
-        studyDgvaDBAdaptor.listStudies();
+        assertThrows(UnsupportedOperationException.class, () -> studyDgvaDBAdaptor.listStudies());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void findStudyNameOrStudyId() throws Exception {
-        studyDgvaDBAdaptor.findStudyNameOrStudyId("Study", new QueryOptions());
+        assertThrows(UnsupportedOperationException.class, () -> studyDgvaDBAdaptor.findStudyNameOrStudyId("Study", new QueryOptions()));
     }
 
     @Test
@@ -70,9 +70,9 @@ public class StudyDgvaDBAdaptorTest {
         assertEquals(DgvaStudyTestData.STUDY_1_ID, variantStudy.getId());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void close() throws Exception {
-        studyDgvaDBAdaptor.close();
+        assertThrows(UnsupportedOperationException.class, () -> studyDgvaDBAdaptor.close());
     }
 
 }

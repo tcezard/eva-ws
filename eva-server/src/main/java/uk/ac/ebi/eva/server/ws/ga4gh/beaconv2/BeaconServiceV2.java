@@ -39,7 +39,7 @@ import uk.ac.ebi.eva.commons.mongodb.services.VariantWithSamplesAndAnnotationsSe
 import uk.ac.ebi.eva.lib.eva_utils.DBAdaptorConnector;
 import uk.ac.ebi.eva.lib.eva_utils.MultiMongoDbFactory;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.ArrayList;
@@ -126,7 +126,7 @@ public class BeaconServiceV2 {
                 return buildBeaconAlleleResponse(true, request, null, null);
             }
             variantMongoList = service.findByRegionAndOtherBeaconFilters(startRange, endRange, filters,
-                    new PageRequest(0, pageSize));
+                    PageRequest.of(0, pageSize));
         } else {
             variantMongoList = Collections.emptyList();
         }

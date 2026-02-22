@@ -24,7 +24,7 @@ import uk.ac.ebi.eva.lib.utils.QueryOptions;
 import uk.ac.ebi.eva.lib.utils.QueryResult;
 import uk.ac.ebi.eva.lib.repositories.DgvaStudyBrowserRepository;
 
-import javax.persistence.Tuple;
+import jakarta.persistence.Tuple;
 import java.util.*;
 
 import static uk.ac.ebi.eva.lib.dgva_utils.DgvaDBUtils.getSpeciesAndTypeFilters;

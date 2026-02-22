@@ -15,11 +15,12 @@
  */
 package uk.ac.ebi.eva.release.models;
 
+import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Objects;
 
 
@@ -45,7 +46,7 @@ public class ReleaseStatsPerTaxonomyV2 {
     @NotFound(action=NotFoundAction.IGNORE)
     private Taxonomy taxonomy;
 
-    @Type(type = "string-array")
+    @Type(StringArrayType.class)
     @Column(
             name = "assembly_accessions",
             columnDefinition = "text[]"

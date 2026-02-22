@@ -18,7 +18,7 @@
  */
 package uk.ac.ebi.eva.server.ws.ga4gh;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,13 +40,13 @@ import uk.ac.ebi.eva.lib.eva_utils.MultiMongoDbFactory;
 import uk.ac.ebi.eva.server.Utils;
 import uk.ac.ebi.eva.server.ws.EvaWSServer;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping(value = "/v1/ga4gh/variantsets", produces = "application/json")
-@Api(tags = { "ga4gh", "files" })
+@Tag(name = "ga4gh")
 public class GA4GHVariantSetWSServer extends EvaWSServer {
 
     @Autowired

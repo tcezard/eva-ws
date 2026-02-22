@@ -15,7 +15,7 @@
  */
 package uk.ac.ebi.eva.lib.entities;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;

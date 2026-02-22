@@ -18,7 +18,7 @@ package uk.ac.ebi.eva.lib.entities;
 
 import uk.ac.ebi.eva.lib.models.Assembly;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * Created by jorizci on 03/10/16.
@@ -47,7 +47,10 @@ import javax.persistence.*;
 @NamedNativeQueries({
         @NamedNativeQuery(
                 name = "Taxonomy.getBrowsableSpecies",
-                query = "select distinct(assembly.*), taxonomy.* " +
+                query = "select distinct assembly.assembly_accession, assembly.assembly_chain, " +
+                        "assembly.assembly_version, assembly.assembly_name, assembly.assembly_code, " +
+                        "taxonomy.taxonomy_id, taxonomy.common_name, taxonomy.scientific_name, " +
+                        "taxonomy.taxonomy_code, taxonomy.eva_name " +
                         "from assembly left join browsable_file bf on assembly.assembly_set_id=bf.assembly_set_id " +
                         " and assembly.assembly_accession = bf.loaded_assembly " +
                         "left join dbsnp_assemblies dbs on assembly.assembly_set_id = dbs.assembly_set_id " +
@@ -57,7 +60,10 @@ import javax.persistence.*;
         ),
         @NamedNativeQuery(
                 name = "Taxonomy.getAccessionedSpecies",
-                query = "select distinct(assembly.*), taxonomy.* " +
+                query = "select distinct assembly.assembly_accession, assembly.assembly_chain, " +
+                        "assembly.assembly_version, assembly.assembly_name, assembly.assembly_code, " +
+                        "taxonomy.taxonomy_id, taxonomy.common_name, taxonomy.scientific_name, " +
+                        "taxonomy.taxonomy_code, taxonomy.eva_name " +
                         "from assembly join taxonomy on assembly.taxonomy_id=taxonomy.taxonomy_id " +
                         "where assembly_in_accessioning_store = true",
                 resultSetMapping = "assembly"

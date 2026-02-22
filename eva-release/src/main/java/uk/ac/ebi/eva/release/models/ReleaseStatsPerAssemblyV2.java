@@ -15,11 +15,12 @@
  */
 package uk.ac.ebi.eva.release.models;
 
+import io.hypersistence.utils.hibernate.type.array.IntArrayType;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Objects;
 
 @Entity
@@ -40,7 +41,7 @@ public class ReleaseStatsPerAssemblyV2 {
     @NotFound(action= NotFoundAction.IGNORE)
     private ReleaseInfo releaseInfo;
 
-    @Type(type = "int-array")
+    @Type(IntArrayType.class)
     @Column(
             name = "taxonomy_ids",
             columnDefinition = "integer[]"

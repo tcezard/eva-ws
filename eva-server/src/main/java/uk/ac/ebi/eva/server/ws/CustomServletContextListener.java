@@ -5,8 +5,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import uk.ac.ebi.eva.lib.eva_utils.MultiMongoDbFactory;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 public class CustomServletContextListener
         implements ServletContextListener {

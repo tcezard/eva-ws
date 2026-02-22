@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.eva.lib.models.FileFtpReference;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

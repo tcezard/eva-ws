@@ -26,62 +26,55 @@ import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.TypeRef;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import uk.ac.ebi.eva.commons.core.models.pipeline.Variant;
 import uk.ac.ebi.eva.commons.mongodb.entities.projections.VariantStudySummary;
-import uk.ac.ebi.eva.commons.mongodb.services.VariantWithSamplesAndAnnotationsService;
-import uk.ac.ebi.eva.lib.Profiles;
 import uk.ac.ebi.eva.server.configuration.MongoRepositoryTestConfiguration;
+import uk.ac.ebi.eva.server.test.TestDataLoader;
 
-import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 
-import static com.lordofthejars.nosqlunit.mongodb.MongoDbRule.MongoDbRuleBuilder.newMongoDbRule;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({MongoRepositoryTestConfiguration.class})
-@UsingDataSet(locations = {
-        "/test-data/files.json"
-})
-@ActiveProfiles(Profiles.TEST_MONGO_FACTORY)
-public class StudyWSServerV2IntegrationTest {
-
-    private static final String TEST_DB = "test-db";
+public class StudyWSServerV2IntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private ApplicationContext applicationContext;
-
-    @Rule
-    public MongoDbRule mongoDbRule = newMongoDbRule().defaultSpringMongoDb(TEST_DB);
-
-    @Autowired
-    MongoDbFactory mongoDbFactory;
 
     @Autowired
     private TestRestTemplate restTemplate;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private TestDataLoader testDataLoader;
+
+    @BeforeEach
+    public void setUp() throws IOException {
+        testDataLoader.load("/test-data/files.json");
+    }
+
+    @AfterEach
+    public void tearDown() {
+        testDataLoader.cleanUp("testFiles");
+    }
 
     @Test
     public void testGetStudies() {

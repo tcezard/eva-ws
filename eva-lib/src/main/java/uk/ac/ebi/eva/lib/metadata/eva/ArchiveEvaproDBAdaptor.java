@@ -30,7 +30,7 @@ import uk.ac.ebi.eva.lib.repositories.EvaStudyBrowserRepository;
 import uk.ac.ebi.eva.lib.repositories.TaxonomyRepository;
 import uk.ac.ebi.eva.lib.utils.QueryOptionsConstants;
 
-import javax.persistence.Tuple;
+import jakarta.persistence.Tuple;
 import java.util.*;
 import java.util.stream.Collectors;
 

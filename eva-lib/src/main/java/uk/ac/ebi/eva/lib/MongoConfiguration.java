@@ -21,8 +21,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.DbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
@@ -43,9 +43,6 @@ public class MongoConfiguration {
 
     @Autowired
     private ApplicationContext applicationContext;
-
-    @Autowired
-    private MongoDbFactory mongoDbFactory;
 
     @Autowired
     private DbCollectionsProperties dbCollectionsProperties;
@@ -86,8 +83,8 @@ public class MongoConfiguration {
     }
 
     @Bean
-    public MappingMongoConverter mappingMongoConverter() throws IOException {
-        DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDbFactory);
+    public MappingMongoConverter mappingMongoConverter(MongoDatabaseFactory mongoDatabaseFactory) throws IOException {
+        DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDatabaseFactory);
         MappingMongoConverter mongoConverter = new MappingMongoConverter(dbRefResolver, mongoMappingContext());
 
         mongoConverter.afterPropertiesSet();
@@ -98,8 +95,8 @@ public class MongoConfiguration {
     }
 
     @Bean
-    public MongoDbFactory mongoDbFactory(SpringDataMongoDbProperties springDataMongoDbProperties) throws Exception {
-        return new SimpleMongoDbFactory(DBAdaptorConnector.getMongoClient(springDataMongoDbProperties),
+    public MongoDatabaseFactory mongoDbFactory(SpringDataMongoDbProperties springDataMongoDbProperties) throws Exception {
+        return new SimpleMongoClientDatabaseFactory(DBAdaptorConnector.getMongoClient(springDataMongoDbProperties),
                                         springDataMongoDbProperties.getDatabase());
     }
 }

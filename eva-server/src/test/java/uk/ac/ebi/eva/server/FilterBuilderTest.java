@@ -18,12 +18,12 @@
  */
 package uk.ac.ebi.eva.server;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FilterBuilderTest {
 

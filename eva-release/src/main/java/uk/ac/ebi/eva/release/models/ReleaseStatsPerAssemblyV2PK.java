@@ -15,7 +15,7 @@
  */
 package uk.ac.ebi.eva.release.models;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 

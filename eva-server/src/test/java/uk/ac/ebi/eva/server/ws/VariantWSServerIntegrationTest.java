@@ -15,57 +15,44 @@
  */
 package uk.ac.ebi.eva.server.ws;
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import uk.ac.ebi.eva.commons.core.models.Annotation;
 import uk.ac.ebi.eva.commons.core.models.ws.VariantSourceEntryWithSampleNames;
 import uk.ac.ebi.eva.commons.core.models.ws.VariantWithSamplesAndAnnotation;
 import uk.ac.ebi.eva.commons.mongodb.services.VariantWithSamplesAndAnnotationsService;
-import uk.ac.ebi.eva.lib.Profiles;
 import uk.ac.ebi.eva.lib.utils.QueryResponse;
 import uk.ac.ebi.eva.lib.utils.QueryResult;
 import uk.ac.ebi.eva.server.configuration.MongoRepositoryTestConfiguration;
+import uk.ac.ebi.eva.server.test.TestDataLoader;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import static com.lordofthejars.nosqlunit.mongodb.MongoDbRule.MongoDbRuleBuilder.newMongoDbRule;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(MongoRepositoryTestConfiguration.class)
-@UsingDataSet(locations = {
-        "/test-data/variants.json",
-        "/test-data/files.json",
-        "/test-data/annotations.json",
-        "/test-data/annotation_metadata.json"
-})
-@ActiveProfiles(Profiles.TEST_MONGO_FACTORY)
-public class VariantWSServerIntegrationTest {
-
-    private static final String TEST_DB = "test-db";
+public class VariantWSServerIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -77,14 +64,21 @@ public class VariantWSServerIntegrationTest {
     private VariantWithSamplesAndAnnotationsService service;
 
     @Autowired
-    MongoDbFactory mongoDbFactory;
+    private TestDataLoader testDataLoader;
 
-    @Rule
-    public MongoDbRule mongoDbRule = newMongoDbRule().defaultSpringMongoDb(TEST_DB);
+    @BeforeEach
+    public void setUp() throws IOException {
+        testDataLoader.load(
+                "/test-data/variants.json",
+                "/test-data/files.json",
+                "/test-data/annotations.json",
+                "/test-data/annotation_metadata.json"
+        );
+    }
 
-
-    @Before
-    public void setUp() throws Exception {
+    @AfterEach
+    public void tearDown() {
+        testDataLoader.cleanUp("testVariants", "testFiles", "testAnnotations", "testMetadata");
     }
 
     @Test
@@ -144,7 +138,7 @@ public class VariantWSServerIntegrationTest {
     @Test
     public void testVariantSearchByList() throws Exception {
         String testVariantIds = "rs370478,rs199692280";
-        String url = "/v1/variants/" + testVariantIds + "/?species=mmusculus_grcm38";
+        String url = "/v1/variants/" + testVariantIds + "?species=mmusculus_grcm38";
         JSONObject jsonObject = WSTestHelpers.testRestTemplateHelperJsonObject(url, restTemplate);
         JSONArray responseArray = jsonObject.getJSONArray("response");
         for (int i = 0; i < responseArray.length(); ++i) {

@@ -16,7 +16,7 @@
 package uk.ac.ebi.eva.server.ws;
 
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ import uk.ac.ebi.eva.lib.utils.QueryResponse;
 import uk.ac.ebi.eva.lib.utils.QueryResult;
 import uk.ac.ebi.eva.server.ws.contigalias.ContigAliasService;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
@@ -44,7 +44,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/v1/features", produces = "application/json")
-@Api(tags = {"features"})
+@Tag(name = "features")
 public class FeatureWSServer extends EvaWSServer {
 
     @Autowired

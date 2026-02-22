@@ -15,7 +15,7 @@
  */
 package uk.ac.ebi.eva.server.models;
 
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 
 public class StatusConverter implements AttributeConverter<Status, String> {
 

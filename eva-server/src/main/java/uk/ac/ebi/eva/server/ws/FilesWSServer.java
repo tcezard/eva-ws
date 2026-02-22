@@ -19,7 +19,7 @@
 
 package uk.ac.ebi.eva.server.ws;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +40,7 @@ import java.util.Arrays;
  */
 @RestController
 @RequestMapping(value = "/v1/files", produces = "application/json")
-@Api(tags = {"files"})
+@Tag(name = "files")
 public class FilesWSServer extends EvaWSServer {
 
     @Autowired

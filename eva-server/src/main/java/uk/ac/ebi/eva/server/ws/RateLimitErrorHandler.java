@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import uk.ac.ebi.eva.server.RateLimitException;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @ControllerAdvice

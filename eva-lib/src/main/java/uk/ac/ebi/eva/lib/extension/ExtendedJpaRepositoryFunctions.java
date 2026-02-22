@@ -4,7 +4,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.Repository;
 
-import javax.persistence.Tuple;
+import jakarta.persistence.Tuple;
 import java.io.Serializable;
 import java.util.List;
 

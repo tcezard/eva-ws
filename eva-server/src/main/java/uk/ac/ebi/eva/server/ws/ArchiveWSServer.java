@@ -19,7 +19,7 @@
 
 package uk.ac.ebi.eva.server.ws;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +43,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/v1/meta", produces = "application/json")
-@Api(tags = {"archive"})
+@Tag(name = "archive")
 public class ArchiveWSServer extends EvaWSServer {
 
     @Autowired

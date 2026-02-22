@@ -15,7 +15,7 @@
  */
 package uk.ac.ebi.eva.release.dto;
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
 import java.util.Objects;
 
 public class ReleaseStatsPerSpeciesDto {

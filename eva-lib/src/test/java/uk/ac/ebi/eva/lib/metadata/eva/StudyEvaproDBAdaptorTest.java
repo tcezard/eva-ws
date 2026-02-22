@@ -15,14 +15,14 @@
  */
 package uk.ac.ebi.eva.lib.metadata.eva;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import uk.ac.ebi.eva.lib.utils.QueryOptions;
 import uk.ac.ebi.eva.lib.utils.QueryResult;
@@ -31,11 +31,12 @@ import uk.ac.ebi.eva.lib.utils.QueryOptionsConstants;
 
 import java.util.function.Predicate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.ac.ebi.eva.lib.metadata.MetadataTestData.HUMAN;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @DataJpaTest
 public class StudyEvaproDBAdaptorTest {
 
@@ -45,12 +46,12 @@ public class StudyEvaproDBAdaptorTest {
     @Autowired
     private StudyEvaproDBAdaptor studyEvaproDBAdaptor;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         EvaStudyBrowserTestData.persistTestData(entityManager);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         entityManager.clear();
     }
@@ -95,14 +96,14 @@ public class StudyEvaproDBAdaptorTest {
                                      .equals(EvaStudyBrowserTestData.EXOME_SEQUENCING));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void listStudies() throws Exception {
-        studyEvaproDBAdaptor.listStudies();
+        assertThrows(UnsupportedOperationException.class, () -> studyEvaproDBAdaptor.listStudies());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void findStudyNameOrStudyId() throws Exception {
-        studyEvaproDBAdaptor.findStudyNameOrStudyId("any study", new QueryOptions());
+        assertThrows(UnsupportedOperationException.class, () -> studyEvaproDBAdaptor.findStudyNameOrStudyId("any study", new QueryOptions()));
     }
 
     @Test
@@ -113,9 +114,9 @@ public class StudyEvaproDBAdaptorTest {
         checkReturnedStudies(queryResult, 1, study -> study.getId().equals(EvaStudyBrowserTestData.PROJECT_ID_1));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void close() throws Exception {
-        studyEvaproDBAdaptor.close();
+        assertThrows(UnsupportedOperationException.class, () -> studyEvaproDBAdaptor.close());
     }
 
     private void checkReturnedStudies(QueryResult<VariantStudy> queryResult, int expectedNumberOfResults,

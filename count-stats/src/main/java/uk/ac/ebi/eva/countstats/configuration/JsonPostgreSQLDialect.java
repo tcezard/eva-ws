@@ -1,12 +1,9 @@
 package uk.ac.ebi.eva.countstats.configuration;
 
-import org.hibernate.dialect.PostgreSQL9Dialect;
+import org.hibernate.dialect.PostgreSQLDialect;
 
-import java.sql.Types;
-
-public class JsonPostgreSQLDialect extends PostgreSQL9Dialect {
+public class JsonPostgreSQLDialect extends PostgreSQLDialect {
     public JsonPostgreSQLDialect() {
         super();
-        this.registerColumnType(Types.JAVA_OBJECT, "json");
     }
 }

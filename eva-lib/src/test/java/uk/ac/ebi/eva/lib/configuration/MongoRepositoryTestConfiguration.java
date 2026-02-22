@@ -2,7 +2,7 @@
  * European Variation Archive (EVA) - Open-access database of all types of genetic
  * variation data from all species
  *
- * Copyright 2017 EMBL - European Bioinformatics Institute
+ * Copyright 2017-2024 EMBL - European Bioinformatics Institute
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,58 +18,51 @@
  */
 package uk.ac.ebi.eva.lib.configuration;
 
-import com.mongodb.MongoClient;
-
-import org.springframework.boot.autoconfigure.mongo.MongoProperties;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import uk.ac.ebi.eva.lib.MongoConfiguration;
-import uk.ac.ebi.eva.lib.eva_utils.DBAdaptorConnector;
-
-import java.net.UnknownHostException;
 
 @Configuration
 @EnableMongoRepositories(basePackages = "uk.ac.ebi.eva.lib.repositories")
 @Import({MongoConfiguration.class})
 @EnableMongoAuditing
-@AutoConfigureDataMongo
 public class MongoRepositoryTestConfiguration {
 
+    private static final MongoDBContainer mongoDBContainer;
+
+    static {
+        mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:6.0"));
+        mongoDBContainer.start();
+    }
+
+    @Bean
     @Primary
-    @Bean
-    @ConfigurationProperties(prefix = "spring.data.mongodb")
-    public MongoProperties mongoProperties() {
-        return new MongoProperties();
+    public MongoClient mongoClient() {
+        return MongoClients.create("mongodb://" + mongoDBContainer.getHost() + ":"
+                + mongoDBContainer.getMappedPort(27017));
     }
 
     @Bean
-    public MongoClient mongoClient(SpringDataMongoDbProperties properties) throws UnknownHostException {
-        return DBAdaptorConnector.getMongoClient(properties);
+    @Primary
+    public MongoDatabaseFactory mongoDbFactory(MongoClient mongoClient) {
+        return new SimpleMongoClientDatabaseFactory(mongoClient, "test-db");
     }
 
     @Bean
-    public MongoTemplate mongoTemplate(MongoDbFactory mongoDbFactory,
-            MappingMongoConverter mappingMongoConverter) throws Exception {
-        return new MongoTemplate(mongoDbFactory, mappingMongoConverter);
-    }
-
-    @Bean
-    public MongoDbFactory mongoDbFactory(MongoClient mongoClient) throws Exception {
-        return new SimpleMongoDbFactory(mongoClient, this.getDatabaseName());
-    }
-
-    private String getDatabaseName() {
-        return "test-db";
+    @Primary
+    public MongoTemplate mongoTemplate(MongoDatabaseFactory mongoDbFactory) {
+        return new MongoTemplate(mongoDbFactory);
     }
 }
