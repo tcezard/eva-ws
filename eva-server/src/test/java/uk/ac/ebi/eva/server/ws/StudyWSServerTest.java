@@ -253,4 +253,11 @@ public class StudyWSServerTest {
                 RoCrateMetadata.class);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
+
+    @Test
+    public void testGetFilesByStudyWithInvalidSpecies() {
+        String url = "/v1/studies/PRJEB0001/files?species=dog_canfam3.1";
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
 }

@@ -31,9 +31,12 @@ import uk.ac.ebi.eva.lib.configuration.SpringDataMongoDbProperties;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Component
 public class DBAdaptorConnector {
+
+    private static final Pattern VALID_SPECIES = Pattern.compile("^[A-Za-z0-9_]+$");
 
     @Autowired
     private DbCollectionsProperties dbCollectionsProperties;
@@ -100,6 +103,9 @@ public class DBAdaptorConnector {
     }
 
     public static String getDBName(String species) {
+        if (species == null || !VALID_SPECIES.matcher(species).matches()) {
+            throw new InvalidSpeciesException(species);
+        }
         return "eva_" + species;
     }
 }
